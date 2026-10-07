@@ -1,0 +1,8 @@
+databricks-sdk>=0.86.0
+# Pinned: the dark-mode styling (core/theme.py) targets this version's widget DOM.
+streamlit==1.64.0
+# openai 3.x moved to httpx2; the SDK's get_open_ai_client() still needs httpx
+openai>=1.40.0,<3
+httpx<1
+altair>=5.0.0
+pandas>=2.0.0

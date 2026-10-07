@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "name": "retail_lakehouse",
+      "target": "prod",
+      "mode": "development",
+      "git": {
+        "branch": "main",
+        "origin_url": "https://github.com/sanketazure19-ai/Retail-Lakehouse.git",
+        "commit": "ba5134998578a122b80a3deb9ed7c4cf9c6a49b5",
+        "bundle_root_path": "Retail_Lakehouse"
+      }
+    },
+    "workspace": {
+      "file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/prod/files"
+    },
+    "resources": {
+      "jobs": {
+        "bronze_ingestion": {
+          "id": "989182603948483",
+          "relative_path": "resources/jobs/bronze_ingestion.yml"
+        },
+        "dq_reprocessing": {
+          "id": "184829832678059",
+          "relative_path": "resources/jobs/dq_reprocessing.yml"
+        },
+        "gold_transformation": {
+          "id": "166050414845187",
+          "relative_path": "resources/jobs/gold_transformation.yml"
+        },
+        "promotions_ingestion": {
+          "id": "441721440632619",
+          "relative_path": "resources/jobs/promotions_ingestion.yml"
+        },
+        "qa_automation": {
+          "id": "446331468583369",
+          "relative_path": "resources/jobs/qa_automation.job.yml"
+        },
+        "retail_lakehouse_pipeline": {
+          "id": "488698992264154",
+          "relative_path": "resources/jobs/retail_lakehouse_pipeline.yml"
+        },
+        "silver_transformation": {
+          "id": "134471477144660",
+          "relative_path": "resources/jobs/silver_transformation.yml"
+        }
+      }
+    },
+    "presets": {
+      "source_linked_deployment": false
+    }
+  },
+  "extra": {}
+}

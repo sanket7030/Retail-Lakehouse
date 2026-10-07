@@ -1,0 +1,23 @@
+resources:
+  jobs:
+    gold_transformation:
+      name: "[${bundle.target}] Retail Lakehouse - Gold Transformation"
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+            dependencies:
+              - ../../dist/*.whl
+
+      tasks:
+
+        - task_key: gold_transformation
+          notebook_task:
+            notebook_path: ../../src/notebooks/03_gold_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default

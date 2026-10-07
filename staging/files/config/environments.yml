@@ -1,0 +1,19 @@
+environments:
+
+  dev:
+    catalog: retail_dev
+    raw_root: /Volumes/retail_dev/bronze/raw_data
+    checkpoint_root: /Volumes/retail_dev/bronze/_checkpoints
+    schema_root: /Volumes/retail_dev/bronze/_schemas
+
+  staging:
+    catalog: retail_staging
+    raw_root: /Volumes/retail_dev/bronze/raw_data
+    checkpoint_root: /Volumes/retail_staging/bronze/_checkpoints
+    schema_root: /Volumes/retail_staging/bronze/_schemas
+
+  prod:
+    catalog: retail_prod
+    raw_root: /Volumes/retail_dev/bronze/raw_data
+    checkpoint_root: /Volumes/retail_prod/bronze/_checkpoints
+    schema_root: /Volumes/retail_prod/bronze/_schemas

@@ -1,0 +1,66 @@
+resources:
+  jobs:
+    silver_transformation:
+      name: "[${bundle.target}] Retail Lakehouse - Silver Transformation"
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+            dependencies:
+              - ../../dist/*.whl
+
+      tasks:
+
+        - task_key: silver_customers
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: customers
+          environment_key: default
+
+        - task_key: silver_products
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: products
+          environment_key: default
+
+        - task_key: silver_orders
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: orders
+          environment_key: default
+
+        - task_key: silver_clickstream
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: clickstream
+          environment_key: default
+
+        - task_key: silver_returns
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: returns
+          environment_key: default
+        - task_key: silver_promotions
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: marketing
+              dataset: promotions
+          environment_key: default

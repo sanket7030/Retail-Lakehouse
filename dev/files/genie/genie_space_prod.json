@@ -1,0 +1,252 @@
+{
+  "version": 2,
+  "config": {
+    "sample_questions": [
+      {
+        "id": "10000000000000000000000000000001",
+        "question": [
+          "What was net revenue by month this year?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000002",
+        "question": [
+          "Top 10 products by net revenue, with their category"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000003",
+        "question": [
+          "Did the latest QA run have any failures or warnings?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000004",
+        "question": [
+          "Which dataset has the highest data-quality failure rate?"
+        ]
+      },
+      {
+        "id": "10000000000000000000000000000005",
+        "question": [
+          "Why were orders quarantined?"
+        ]
+      }
+    ]
+  },
+  "data_sources": {
+    "tables": [
+      {
+        "identifier": "retail_prod.gold.customer_revenue_summary"
+      },
+      {
+        "identifier": "retail_prod.gold.customer_sales_summary"
+      },
+      {
+        "identifier": "retail_prod.gold.daily_sales_summary"
+      },
+      {
+        "identifier": "retail_prod.gold.dim_customer"
+      },
+      {
+        "identifier": "retail_prod.gold.dim_date"
+      },
+      {
+        "identifier": "retail_prod.gold.dim_product"
+      },
+      {
+        "identifier": "retail_prod.gold.fact_orders"
+      },
+      {
+        "identifier": "retail_prod.gold.fact_returns"
+      },
+      {
+        "identifier": "retail_prod.gold.monthly_sales_summary"
+      },
+      {
+        "identifier": "retail_prod.gold.product_revenue_summary"
+      },
+      {
+        "identifier": "retail_prod.gold.product_sales_summary"
+      },
+      {
+        "identifier": "retail_prod.gold.promotion_product_summary"
+      },
+      {
+        "identifier": "retail_prod.monitoring.bronze_ingestion_metrics"
+      },
+      {
+        "identifier": "retail_prod.monitoring.databricks_job_logs"
+      },
+      {
+        "identifier": "retail_prod.monitoring.qa_run_summary"
+      },
+      {
+        "identifier": "retail_prod.monitoring.qa_test_results"
+      },
+      {
+        "identifier": "retail_prod.monitoring.silver_dq_metrics"
+      },
+      {
+        "identifier": "retail_prod.silver_quarantine.customers"
+      },
+      {
+        "identifier": "retail_prod.silver_quarantine.orders"
+      },
+      {
+        "identifier": "retail_prod.silver_quarantine.promotions"
+      },
+      {
+        "identifier": "retail_prod.silver_quarantine.returns"
+      }
+    ]
+  },
+  "instructions": {
+    "example_question_sqls": [
+      {
+        "id": "20000000000000000000000000000001",
+        "question": [
+          "What was net revenue by month this year?"
+        ],
+        "sql": [
+          "SELECT year, month, net_sales_amount, refund_amount, net_revenue\n",
+          "FROM retail_prod.gold.monthly_sales_summary\n",
+          "WHERE year = year(current_date())\n",
+          "ORDER BY month"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000002",
+        "question": [
+          "Top 10 products by net revenue"
+        ],
+        "sql": [
+          "SELECT p.product_name, p.category, r.units_sold, r.net_revenue\n",
+          "FROM retail_prod.gold.product_revenue_summary r\n",
+          "JOIN retail_prod.gold.dim_product p ON r.product_id = p.product_id\n",
+          "ORDER BY r.net_revenue DESC\n",
+          "LIMIT 10"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000003",
+        "question": [
+          "Top 10 customers by net revenue"
+        ],
+        "sql": [
+          "SELECT c.customer_id, concat_ws(' ', c.first_name, c.last_name) AS customer_name, c.customer_segment,\n",
+          "       r.order_count, r.net_revenue\n",
+          "FROM retail_prod.gold.customer_revenue_summary r\n",
+          "JOIN retail_prod.gold.dim_customer c ON r.customer_id = c.customer_id AND c.is_current = true\n",
+          "ORDER BY r.net_revenue DESC\n",
+          "LIMIT 10"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000004",
+        "question": [
+          "Summarize the latest QA run"
+        ],
+        "sql": [
+          "SELECT qa_run_id, status, total_tests, passed, warnings, failed, pass_rate_percent, started_at, duration_seconds\n",
+          "FROM retail_prod.monitoring.qa_run_summary\n",
+          "ORDER BY started_at DESC\n",
+          "LIMIT 1"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000005",
+        "question": [
+          "Which tests did not pass in the latest QA run?"
+        ],
+        "sql": [
+          "SELECT layer, test_name, status, actual, expected, details\n",
+          "FROM retail_prod.monitoring.qa_test_results\n",
+          "WHERE qa_run_id = (SELECT qa_run_id FROM retail_prod.monitoring.qa_run_summary ORDER BY started_at DESC LIMIT 1)\n",
+          "  AND status <> 'PASS'\n",
+          "ORDER BY status, layer, test_name"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000006",
+        "question": [
+          "Latest data-quality status per dataset"
+        ],
+        "sql": [
+          "SELECT dataset, dq_status, total_records, valid_records, quarantined_records, dq_failure_rate_percent,\n",
+          "       dq_failure_threshold_percent, recorded_at\n",
+          "FROM retail_prod.monitoring.silver_dq_metrics\n",
+          "QUALIFY row_number() OVER (PARTITION BY dataset ORDER BY recorded_at DESC) = 1\n",
+          "ORDER BY dq_failure_rate_percent DESC"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000007",
+        "question": [
+          "Why were orders quarantined?"
+        ],
+        "sql": [
+          "SELECT trim(reason) AS reason, count(*) AS records\n",
+          "FROM (SELECT explode(split(_quality_reason, ';')) AS reason FROM retail_prod.silver_quarantine.orders)\n",
+          "GROUP BY 1\n",
+          "ORDER BY records DESC"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000008",
+        "question": [
+          "Which product category had the most refunds?"
+        ],
+        "sql": [
+          "SELECT p.category, count(*) AS returns, round(sum(r.refund_amount), 2) AS refund_amount\n",
+          "FROM retail_prod.gold.fact_returns r\n",
+          "JOIN retail_prod.gold.fact_orders o ON r.order_id = o.order_id\n",
+          "JOIN retail_prod.gold.dim_product p ON o.product_id = p.product_id\n",
+          "GROUP BY p.category\n",
+          "ORDER BY refund_amount DESC"
+        ]
+      },
+      {
+        "id": "20000000000000000000000000000009",
+        "question": [
+          "How many returns reference orders that don't exist?"
+        ],
+        "sql": [
+          "SELECT count(*) AS orphan_returns, round(sum(r.refund_amount), 2) AS orphan_refund_amount\n",
+          "FROM retail_prod.gold.fact_returns r\n",
+          "LEFT ANTI JOIN retail_prod.gold.fact_orders o ON r.order_id = o.order_id"
+        ]
+      }
+    ],
+    "text_instructions": [
+      {
+        "id": "30000000000000000000000000000001",
+        "content": [
+          "You answer questions about GlobalMart's retail lakehouse in the PROD catalog `retail_prod`.\n",
+          "Tables:\n",
+          "- gold: star schema. fact_orders (order_id, customer_id, product_id, order_date, quantity, unit_price, discount_amount, gross_amount, net_sales_amount, payment_method, order_status), fact_returns (return_id, order_id, customer_id, product_id, return_date, return_quantity, refund_amount, return_reason, return_status), dim_customer (first_name, last_name, customer_segment; SCD Type 2: effective_start_date, effective_end_date, is_current), dim_product (product_id, product_name, category, subcategory, brand, unit_price), dim_date. Summaries: daily_sales_summary (order_date), monthly_sales_summary (year, month), product_revenue_summary / customer_revenue_summary (order_count, units_sold, gross_sales_amount, discount_amount, net_sales_amount, refund_amount, net_revenue), product_sales_summary / customer_sales_summary (no refunds), promotion_product_summary (promotion_id, promotion_name, product_id, product_name, category, brand, start_date, end_date, discount_percent).\n",
+          "- monitoring: qa_run_summary (one row per QA run: qa_run_id, status PASS/WARN/FAIL, total_tests, passed, warnings, failed, pass_rate_percent, started_at, finished_at, duration_seconds), qa_test_results (one row per test, joined by qa_run_id: layer, test_name, status, actual, expected, details), silver_dq_metrics (one row per dataset per batch: dq_failure_rate_percent, dq_failure_threshold_percent, dq_status PASS/ALERT), bronze_ingestion_metrics (rescued/corrupt record rates, ingestion_status OK/ALERT), databricks_job_logs (task-level pipeline logs).\n",
+          "- silver_quarantine: rows rejected by Silver data-quality rules for customers, orders, promotions, returns; `_quality_reason` holds semicolon-separated reasons.\n",
+          "\n",
+          "Metric definitions:\n",
+          "- gross_amount = quantity * unit_price; net_sales_amount = gross_amount - discount_amount.\n",
+          "- net_revenue = net_sales_amount - refund_amount. Prefer the *_revenue_summary, daily and monthly tables for revenue.\n",
+          "- Many fact_returns rows reference order_ids that are not in fact_orders (\"orphan returns\"). Revenue summaries only count refunds for returns whose order exists; do the same when computing from facts, and mention orphan returns when refunds are discussed.\n",
+          "- IMPORTANT: fact_returns.product_id usually does NOT match dim_product (about 145 of 160 returns). For the product, category or brand of a return, join fact_returns to fact_orders on order_id and use fact_orders.product_id -> dim_product. Never join fact_returns.product_id to dim_product directly. Say that orphan returns (order not in fact_orders) are excluded.\n",
+          "- Return rate = total refund_amount / total net_sales_amount unless the user asks about units.\n",
+          "- Current customer attributes: dim_customer WHERE is_current = true.\n",
+          "- A data-quality ALERT means the failure rate exceeded the 1% threshold.\n",
+          "\n",
+          "How to answer:\n",
+          "- Show names, not only IDs: join dim_product or dim_customer (is_current = true).\n",
+          "- For QA questions use the latest run by started_at unless a qa_run_id is given, and always state the qa_run_id.\n",
+          "- For data-quality status take the latest row per dataset by recorded_at.\n",
+          "- For \"why quarantined\" questions, split and count _quality_reason; never guess reasons.\n",
+          "- When summarizing results (best/worst month, peaks, totals), base the summary on ALL returned rows, not only the first few.\n",
+          "- When asked \"by how much\", give the difference to the next-best value.\n",
+          "- Format money as USD with two decimals.\n"
+        ]
+      }
+    ]
+  }
+}

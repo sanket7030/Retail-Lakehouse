@@ -1,0 +1,26 @@
+# Native theme = the LIGHT palette of the design tokens (core/theme.py).
+# Dark mode is a per-viewer toggle in the sidebar, applied by core/theme.py.
+
+[theme]
+base = "light"
+primaryColor = "#2a78d6"
+backgroundColor = "#f6f6f3"
+secondaryBackgroundColor = "#efeeea"
+textColor = "#141413"
+borderColor = "#dddcd5"
+linkColor = "#1c5cab"
+codeBackgroundColor = "#efeeea"
+baseRadius = "0.5rem"
+font = "'IBM Plex Sans':https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+codeFont = "'IBM Plex Mono':https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+chartCategoricalColors = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
+
+[theme.sidebar]
+backgroundColor = "#efeeea"
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[browser]
+gatherUsageStats = false

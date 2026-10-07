@@ -1,0 +1,771 @@
+{
+ "state_version": 3,
+ "cli_version": "1.19.0",
+ "lineage": "c69fc609-796f-436f-b6b7-7b76718b1f57",
+ "serial": 7,
+ "state": {
+  "resources.apps.retail_lakehouse_qa": {
+   "__id__": "retail-lakehouse-qa",
+   "state": {
+    "description": "GlobalMart Retail Lakehouse — QA, data quality, insights and AI assistant",
+    "name": "retail-lakehouse-qa",
+    "resources": [
+     {
+      "name": "sql-warehouse",
+      "sql_warehouse": {
+       "id": "f7c38881dd7a3cfb",
+       "permission": "CAN_USE"
+      }
+     },
+     {
+      "name": "serving-endpoint",
+      "serving_endpoint": {
+       "name": "databricks-gpt-oss-120b",
+       "permission": "CAN_QUERY"
+      }
+     },
+     {
+      "job": {
+       "id": "248376491288270",
+       "permission": "CAN_MANAGE"
+      },
+      "name": "dev-e2e-job"
+     },
+     {
+      "job": {
+       "id": "480838482547489",
+       "permission": "CAN_MANAGE"
+      },
+      "name": "dev-qa-job"
+     },
+     {
+      "job": {
+       "id": "806206709339970",
+       "permission": "CAN_MANAGE"
+      },
+      "name": "staging-e2e-job"
+     },
+     {
+      "job": {
+       "id": "900434842924257",
+       "permission": "CAN_MANAGE"
+      },
+      "name": "staging-qa-job"
+     },
+     {
+      "job": {
+       "id": "488698992264154",
+       "permission": "CAN_MANAGE"
+      },
+      "name": "prod-e2e-job"
+     },
+     {
+      "job": {
+       "id": "446331468583369",
+       "permission": "CAN_MANAGE"
+      },
+      "name": "prod-qa-job"
+     }
+    ],
+    "source_code_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/app",
+    "user_api_scopes": [
+     "sql",
+     "dashboards.genie"
+    ]
+   },
+   "depends_on": [
+    {
+     "node": "resources.jobs.qa_automation",
+     "label": "${resources.jobs.qa_automation.id}"
+    },
+    {
+     "node": "resources.jobs.retail_lakehouse_pipeline",
+     "label": "${resources.jobs.retail_lakehouse_pipeline.id}"
+    }
+   ]
+  },
+  "resources.jobs.bronze_ingestion": {
+   "__id__": "229718908251879",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "4",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] [dev] Retail Lakehouse - Bronze Ingestion",
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "clickstream",
+        "domain": "ecommerce",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_clickstream"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "customers",
+        "domain": "erp",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_customers"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "orders",
+        "domain": "erp",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_orders"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "products",
+        "domain": "erp",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_products"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "returns",
+        "domain": "ecommerce",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_returns"
+     }
+    ]
+   }
+  },
+  "resources.jobs.dq_reprocessing": {
+   "__id__": "920410403729636",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "2",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] Retail Lakehouse - DQ Reprocessing",
+    "parameters": [
+     {
+      "default": "dev",
+      "name": "environment"
+     },
+     {
+      "default": "erp",
+      "name": "domain"
+     },
+     {
+      "default": "customers",
+      "name": "dataset"
+     },
+     {
+      "default": "",
+      "name": "batch_id"
+     }
+    ],
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "batch_id": "{{job.parameters.batch_id}}",
+        "dataset": "{{job.parameters.dataset}}",
+        "domain": "{{job.parameters.domain}}",
+        "environment": "{{job.parameters.environment}}",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/05_dq_reprocessing"
+      },
+      "task_key": "dq_reprocessing"
+     }
+    ]
+   }
+  },
+  "resources.jobs.gold_transformation": {
+   "__id__": "702091913568969",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "4",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] [dev] Retail Lakehouse - Gold Transformation",
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/03_gold_transformation"
+      },
+      "task_key": "gold_transformation"
+     }
+    ]
+   }
+  },
+  "resources.jobs.promotions_ingestion": {
+   "__id__": "1008861697408882",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "4",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] [dev] Retail Lakehouse - Promotions Ingestion",
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/04_promotions_ingestion"
+      },
+      "task_key": "promotions_ingestion"
+     }
+    ]
+   }
+  },
+  "resources.jobs.qa_automation": {
+   "__id__": "480838482547489",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "4",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] [dev] Retail Lakehouse - QA Automation",
+    "parameters": [
+     {
+      "default": "dev",
+      "name": "environment"
+     },
+     {
+      "default": "",
+      "name": "qa_run_id"
+     },
+     {
+      "default": "",
+      "name": "triggered_by"
+     },
+     {
+      "default": "{{job.id}}",
+      "name": "job_id"
+     },
+     {
+      "default": "{{job.run_id}}",
+      "name": "job_run_id"
+     }
+    ],
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/06_qa_automation"
+      },
+      "task_key": "qa_validation"
+     }
+    ]
+   }
+  },
+  "resources.jobs.retail_lakehouse_pipeline": {
+   "__id__": "248376491288270",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "4",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] [dev] Retail Lakehouse - End to End Pipeline",
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "clickstream",
+        "domain": "ecommerce",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_clickstream"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "customers",
+        "domain": "erp",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_customers"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "orders",
+        "domain": "erp",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_orders"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "products",
+        "domain": "erp",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_products"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "returns",
+        "domain": "ecommerce",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/01_bronze_ingestion"
+      },
+      "task_key": "bronze_returns"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "silver_customers"
+       },
+       {
+        "task_key": "silver_products"
+       },
+       {
+        "task_key": "silver_orders"
+       },
+       {
+        "task_key": "silver_clickstream"
+       },
+       {
+        "task_key": "silver_returns"
+       },
+       {
+        "task_key": "silver_promotions"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/03_gold_transformation"
+      },
+      "task_key": "gold_transformation"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/04_promotions_ingestion"
+      },
+      "task_key": "promotions_ingestion"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "bronze_clickstream"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "clickstream",
+        "domain": "ecommerce",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_clickstream"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "bronze_customers"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "customers",
+        "domain": "erp",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_customers"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "bronze_orders"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "orders",
+        "domain": "erp",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_orders"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "bronze_products"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "products",
+        "domain": "erp",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_products"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "promotions_ingestion"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "promotions",
+        "domain": "marketing",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_promotions"
+     },
+     {
+      "depends_on": [
+       {
+        "task_key": "bronze_returns"
+       }
+      ],
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "returns",
+        "domain": "ecommerce",
+        "environment": "dev",
+        "job_id": "{{job.id}}",
+        "job_run_id": "{{job.run_id}}",
+        "task_run_id": "{{task.run_id}}"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_returns"
+     }
+    ]
+   }
+  },
+  "resources.jobs.silver_transformation": {
+   "__id__": "418532636304207",
+   "state": {
+    "deployment": {
+     "kind": "BUNDLE",
+     "metadata_file_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/state/metadata.json"
+    },
+    "edit_mode": "UI_LOCKED",
+    "environments": [
+     {
+      "environment_key": "default",
+      "spec": {
+       "client": "4",
+       "dependencies": [
+        "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/artifacts/.internal/retail_lakehouse-0.0.1-py3-none-any.whl"
+       ]
+      }
+     }
+    ],
+    "format": "MULTI_TASK",
+    "max_concurrent_runs": 4,
+    "name": "[dev sanketbhagwat34] [dev] Retail Lakehouse - Silver Transformation",
+    "queue": {
+     "enabled": true
+    },
+    "tags": {
+     "dev": "sanketbhagwat34"
+    },
+    "tasks": [
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "clickstream",
+        "domain": "ecommerce",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_clickstream"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "customers",
+        "domain": "erp",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_customers"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "orders",
+        "domain": "erp",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_orders"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "products",
+        "domain": "erp",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_products"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "promotions",
+        "domain": "marketing",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_promotions"
+     },
+     {
+      "environment_key": "default",
+      "notebook_task": {
+       "base_parameters": {
+        "dataset": "returns",
+        "domain": "ecommerce",
+        "environment": "dev"
+       },
+       "notebook_path": "/Workspace/Users/sanketbhagwat34@gmail.com/.bundle/retail_lakehouse/dev/files/src/notebooks/02_silver_transformation"
+      },
+      "task_key": "silver_returns"
+     }
+    ]
+   }
+  }
+ }
+}

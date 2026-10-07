@@ -1,0 +1,5 @@
+customer_id,first_name,last_name,email,city,state,country,signup_date,customer_segment
+,Test,Invalid,test@example.com,Mumbai,MH,India,2026-09-01,Regular
+CUST999,Test,Invalid,,Pune,MH,India,2026-09-02,Regular
+CUST998,Test,Invalid,test2@example.com,Nagpur,MH,India,,Regular
+CUST997,Test,Invalid,test3@example.com,Mumbai,MH,India,2026-09-03,

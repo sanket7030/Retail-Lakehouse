@@ -1,0 +1,88 @@
+bundle:
+  name: retail_lakehouse
+
+include:
+  - resources/**/*.yml
+
+sync:
+  include:
+    - src/**
+    - config/**
+  exclude:
+    - .databricks/**
+    - .vscode/**
+    - tests/**
+
+variables:
+  warehouse_id:
+    description: SQL warehouse the QA app queries (dashboards, explorer, Ask AI)
+    default: ""
+  llm_endpoint:
+    description: Chat model serving endpoint (tool-calling capable) for the Ask AI page
+    default: databricks-gpt-oss-120b
+
+targets:
+
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-8e8728a6-551c.cloud.databricks.com
+      root_path: ~/.bundle/${bundle.name}/${bundle.target}
+
+    variables:
+      warehouse_id:
+        lookup:
+          warehouse: "Serverless Starter Warehouse"
+
+    resources:
+      apps:
+        retail_lakehouse_qa:
+          name: retail-lakehouse-qa
+          description: "GlobalMart Retail Lakehouse — QA, data quality, insights and AI assistant"
+          source_code_path: app
+          resources:
+            - name: sql-warehouse
+              sql_warehouse:
+                id: ${var.warehouse_id}
+                permission: CAN_USE
+            - name: serving-endpoint
+              serving_endpoint:
+                name: ${var.llm_endpoint}
+                permission: CAN_QUERY
+            - name: dev-e2e-job
+              job:
+                id: ${resources.jobs.retail_lakehouse_pipeline.id}
+                permission: CAN_MANAGE
+            - name: dev-qa-job
+              job:
+                id: ${resources.jobs.qa_automation.id}
+                permission: CAN_MANAGE
+            - name: staging-e2e-job
+              job:
+                id: 806206709339970
+                permission: CAN_MANAGE
+            - name: staging-qa-job
+              job:
+                id: 900434842924257
+                permission: CAN_MANAGE
+            - name: prod-e2e-job
+              job:
+                id: 488698992264154
+                permission: CAN_MANAGE
+            - name: prod-qa-job
+              job:
+                id: 446331468583369
+                permission: CAN_MANAGE
+
+  staging:
+    mode: development
+    workspace:
+      host: https://dbc-8e8728a6-551c.cloud.databricks.com
+      root_path: ~/.bundle/${bundle.name}/${bundle.target}
+
+  prod:
+    mode: development
+    workspace:
+      host: https://dbc-8e8728a6-551c.cloud.databricks.com
+      root_path: ~/.bundle/${bundle.name}/${bundle.target}

@@ -1,0 +1,58 @@
+resources:
+  jobs:
+    bronze_ingestion:
+      name: "[${bundle.target}] Retail Lakehouse - Bronze Ingestion"
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+            dependencies:
+              - ../../dist/*.whl
+
+      tasks:
+
+        - task_key: bronze_customers
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: customers
+          environment_key: default
+
+        - task_key: bronze_products
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: products
+          environment_key: default
+
+        - task_key: bronze_orders
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: orders
+          environment_key: default
+
+        - task_key: bronze_clickstream
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: clickstream
+          environment_key: default
+
+        - task_key: bronze_returns
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: returns
+          environment_key: default

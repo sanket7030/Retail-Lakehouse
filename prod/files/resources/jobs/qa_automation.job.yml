@@ -1,0 +1,31 @@
+resources:
+  jobs:
+    qa_automation:
+      name: "[${bundle.target}] Retail Lakehouse - QA Automation"
+
+      # Job-level parameters flow into the notebook widgets of the same name.
+      # The QA app passes environment, qa_run_id and triggered_by on run_now.
+      parameters:
+        - name: environment
+          default: ${bundle.target}
+        - name: qa_run_id
+          default: ""
+        - name: triggered_by
+          default: ""
+        - name: job_id
+          default: "{{job.id}}"
+        - name: job_run_id
+          default: "{{job.run_id}}"
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+            dependencies:
+              - ../../dist/*.whl
+
+      tasks:
+        - task_key: qa_validation
+          notebook_task:
+            notebook_path: ../../src/notebooks/06_qa_automation.py
+          environment_key: default

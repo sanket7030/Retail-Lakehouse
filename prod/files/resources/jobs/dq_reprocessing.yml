@@ -1,0 +1,40 @@
+resources:
+  jobs:
+
+    dq_reprocessing:
+      name: Retail Lakehouse - DQ Reprocessing
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "2"
+            dependencies:
+              - ../../dist/*.whl
+
+      parameters:
+        - name: environment
+          default: dev
+        - name: domain
+          default: erp
+        - name: dataset
+          default: customers
+        - name: batch_id
+          default: ""
+
+      tasks:
+
+        - task_key: dq_reprocessing
+
+          environment_key: default
+
+          notebook_task:
+            notebook_path: ../../src/notebooks/05_dq_reprocessing.py
+
+            base_parameters:
+              environment: "{{job.parameters.environment}}"
+              domain: "{{job.parameters.domain}}"
+              dataset: "{{job.parameters.dataset}}"
+              batch_id: "{{job.parameters.batch_id}}"
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"

@@ -1,0 +1,20 @@
+resources:
+  jobs:
+    promotions_ingestion:
+      name: "[${bundle.target}] Retail Lakehouse - Promotions Ingestion"
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+            dependencies:
+              - ../../dist/*.whl
+
+      tasks:
+
+        - task_key: promotions_ingestion
+          notebook_task:
+            notebook_path: ../../src/notebooks/04_promotions_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+          environment_key: default

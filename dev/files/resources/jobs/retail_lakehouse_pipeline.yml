@@ -1,0 +1,196 @@
+resources:
+  jobs:
+    retail_lakehouse_pipeline:
+      name: "[${bundle.target}] Retail Lakehouse - End to End Pipeline"
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "4"
+            dependencies:
+              - ../../dist/*.whl
+
+      tasks:
+
+        # ============================================================
+        # BRONZE
+        # ============================================================
+
+        - task_key: bronze_customers
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: customers
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: bronze_products
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: products
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: bronze_orders
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: orders
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: bronze_clickstream
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: clickstream
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: bronze_returns
+          notebook_task:
+            notebook_path: ../../src/notebooks/01_bronze_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: returns
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: promotions_ingestion
+          notebook_task:
+            notebook_path: ../../src/notebooks/04_promotions_ingestion.py
+            base_parameters:
+              environment: ${bundle.target}
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        # ============================================================
+        # SILVER
+        # ============================================================
+
+        - task_key: silver_customers
+          depends_on:
+            - task_key: bronze_customers
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: customers
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: silver_products
+          depends_on:
+            - task_key: bronze_products
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: products
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: silver_orders
+          depends_on:
+            - task_key: bronze_orders
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: erp
+              dataset: orders
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: silver_clickstream
+          depends_on:
+            - task_key: bronze_clickstream
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: clickstream
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: silver_returns
+          depends_on:
+            - task_key: bronze_returns
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: ecommerce
+              dataset: returns
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        - task_key: silver_promotions
+          depends_on:
+            - task_key: promotions_ingestion
+          notebook_task:
+            notebook_path: ../../src/notebooks/02_silver_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              domain: marketing
+              dataset: promotions
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
+
+        # ============================================================
+        # GOLD
+        # ============================================================
+
+        - task_key: gold_transformation
+          depends_on:
+            - task_key: silver_customers
+            - task_key: silver_products
+            - task_key: silver_orders
+            - task_key: silver_clickstream
+            - task_key: silver_returns
+            - task_key: silver_promotions
+          notebook_task:
+            notebook_path: ../../src/notebooks/03_gold_transformation.py
+            base_parameters:
+              environment: ${bundle.target}
+              job_id: "{{job.id}}"
+              job_run_id: "{{job.run_id}}"
+              task_run_id: "{{task.run_id}}"
+          environment_key: default
